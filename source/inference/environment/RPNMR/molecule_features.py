@@ -2,38 +2,39 @@ import pandas as pd
 import numpy as np
 import sklearn.metrics
 import torch
-#from numba import jit
+
+# from numba import jit
 import scipy.spatial
 from rdkit import Chem
 from .util import get_nos_coords
 
 
-def feat_tensor_mol(mol, feat_distances=True, feat_r_pow = None, 
-                    MAX_POW_M = 2.0, conf_idx = 0):
+def feat_tensor_mol(
+    mol, feat_distances=True, feat_r_pow=None, MAX_POW_M=2.0, conf_idx=0
+):
     """
     Return matrix features for molecule
-    
+
     """
     res_mats = []
-    
+
     atomic_nos, coords = get_nos_coords(mol, conf_idx)
     ATOM_N = len(atomic_nos)
 
     if feat_distances:
         pos = coords
         a = pos.T.reshape(1, 3, -1)
-        b = (a - a.T)
+        b = a - a.T
         c = np.swapaxes(b, 2, 1)
         res_mats.append(c)
     if feat_r_pow is not None:
         pos = coords
         a = pos.T.reshape(1, 3, -1)
-        b = (a - a.T)**2
+        b = (a - a.T) ** 2
         c = np.swapaxes(b, 2, 1)
         d = np.sqrt(np.sum(c, axis=2))
         e = (np.eye(d.shape[0]) + d)[:, :, np.newaxis]
 
-                       
         for p in feat_r_pow:
             e_pow = e**p
             if (e_pow > MAX_POW_M).any():
@@ -43,12 +44,13 @@ def feat_tensor_mol(mol, feat_distances=True, feat_r_pow = None,
             res_mats.append(e_pow)
     if len(res_mats) > 0:
         M = np.concatenate(res_mats, 2)
-    else: # Empty matrix
+    else:  # Empty matrix
         M = np.zeros((ATOM_N, ATOM_N, 0), dtype=np.float32)
 
-    return M 
+    return M
 
-def mol_to_nums_adj(m, MAX_ATOM_N=None):# , kekulize=False):
+
+def mol_to_nums_adj(m, MAX_ATOM_N=None):  # , kekulize=False):
     """
     molecule to symmetric adjacency matrix
     """
@@ -82,10 +84,9 @@ def mol_to_nums_adj(m, MAX_ATOM_N=None):# , kekulize=False):
     return atomic_nums, adj
 
 
-
-def feat_mol_adj(mol, edge_weighted=True, add_identity=False, 
-
-                 norm_adj=False, split_weights = None):
+def feat_mol_adj(
+    mol, edge_weighted=True, add_identity=False, norm_adj=False, split_weights=None
+):
     """
     Compute the adjacency matrix for this molecule
 
@@ -95,29 +96,29 @@ def feat_mol_adj(mol, edge_weighted=True, add_identity=False,
     NOTE: We do not kekulize the molecule, we assume that has already been done
 
     """
-    
+
     atomic_nos, adj = mol_to_nums_adj(mol)
     ADJ_N = adj.shape[0]
     adj = torch.Tensor(adj)
-    
+
     if edge_weighted and split_weights is not None:
         raise ValueError("can' have both weighted edies and split the weights")
-    
+
     if split_weights is None:
         adj = adj.unsqueeze(0)
         if edge_weighted:
-            pass # already weighted
+            pass  # already weighted
         else:
             adj[adj > 0] = 1.0
     else:
-        split_adj = torch.zeros((len(split_weights), ADJ_N, ADJ_N ))
+        split_adj = torch.zeros((len(split_weights), ADJ_N, ADJ_N))
         for i in range(len(split_weights)):
-            split_adj[i] = (adj == split_weights[i])
+            split_adj[i] = adj == split_weights[i]
         adj = split_adj
-        
+
     if norm_adj and not add_identity:
         raise ValueError()
-        
+
     if add_identity:
         adj = adj + torch.eye(ADJ_N)
 
@@ -129,8 +130,7 @@ def feat_mol_adj(mol, edge_weighted=True, add_identity=False,
 
             s1 = D_12.reshape(ADJ_N, 1)
             s2 = D_12.reshape(1, ADJ_N)
-            adj_i = s1 * a * s2 
+            adj_i = s1 * a * s2
             res.append(adj_i)
         adj = torch.stack(res)
     return adj
-
