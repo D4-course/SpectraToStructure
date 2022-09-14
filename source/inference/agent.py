@@ -6,7 +6,6 @@ import time
 import sys
 from copy import deepcopy
 
-import torch.multiprocessing as mp
 import torch
 # local imports
 import numpy as np
@@ -17,7 +16,6 @@ from environment.environment import Env
 from environment.molecule_state import MolState
 from environment.RPNMR import predictor_new as P
 
-mp.set_sharing_strategy("file_system")
 MAX_NODES = 9
 N_MCTS = 1
 MAX_ACTIONS = MAX_NODES * MAX_NODES * 3
@@ -29,6 +27,17 @@ def execute_episode(model, molform, spectra, episode_actor):
     """
     Executes an episode of search for a molform and spectra
     """
+
+    if molform[0] < 1 or len(spectra) < 1:
+        raise Exception("Molecule needs to have at least one Carbon")
+
+    if molform[0] != len(spectra):
+        raise Exception("Number of C13 signals and number of Carbons in molecular formula do not match")
+
+    for each_c in spectra:
+        if len(each_c) != 3:
+            raise Exception("Input spectra does not have Shifts, Splits, and Index values")
+
     env = Env(molform, spectra, episode_actor)
 
     a_store = []
@@ -104,6 +113,8 @@ model_episode.load_state_dict(deepcopy(model_instance.state_dict()))
 
 episode_actor_instance = EpisodeActor()
 
+def get_models():
+    return model_instance, episode_actor_instance
 
 def run():
     """
