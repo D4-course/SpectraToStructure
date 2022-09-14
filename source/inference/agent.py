@@ -32,7 +32,8 @@ def execute_episode(model, molform, spectra, episode_actor):
         raise Exception("Molecule needs to have at least one Carbon")
 
     if molform[0] != len(spectra):
-        raise Exception("Number of C13 signals and number of Carbons in molecular formula do not match")
+        raise Exception("Number of C13 signals and number of Carbons " +
+                        "in molecular formula do not match")
 
     for each_c in spectra:
         if len(each_c) != 3:
@@ -89,6 +90,7 @@ class EpisodeActor:
     """
     Serial analogue of episode actor which distributes forward calls to multiple GPUs
     """
+
     def __init__(self):
         self.nmr_pred_object = P.NMRPredictor(
             "../../trainedModels/RPNMRModels/best_model.meta",
@@ -113,8 +115,13 @@ model_episode.load_state_dict(deepcopy(model_instance.state_dict()))
 
 episode_actor_instance = EpisodeActor()
 
+
 def get_models():
+    """
+    Returns model instances
+    """
     return model_instance, episode_actor_instance
+
 
 def run():
     """
