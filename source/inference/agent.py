@@ -10,11 +10,11 @@ import torch
 # local imports
 import numpy as np
 
-from model import ActionPredictionModel
-from mcts import MCTS
-from environment.environment import Env
-from environment.molecule_state import MolState
-from environment.RPNMR import predictor_new as P
+from source.inference.model import ActionPredictionModel
+from source.inference.mcts import MCTS
+from source.inference.environment.environment import Env
+from source.inference.environment.molecule_state import MolState
+from source.inference.environment.RPNMR import predictor_new as P
 
 MAX_NODES = 9
 N_MCTS = 1
@@ -93,8 +93,8 @@ class EpisodeActor:
 
     def __init__(self):
         self.nmr_pred_object = P.NMRPredictor(
-            "../../trainedModels/RPNMRModels/best_model.meta",
-            "../../trainedModels/RPNMRModels/best_model.00000000.state",
+            "trainedModels/RPNMRModels/best_model.meta",
+            "trainedModels/RPNMRModels/best_model.00000000.state",
             False,
         )
 
@@ -108,7 +108,7 @@ class EpisodeActor:
 ### --------------models------------------ ###
 model_instance = ActionPredictionModel(77, 6, 77, 64)
 model_instance.load_state_dict(
-    torch.load("../../trainedModels/default.state", map_location="cpu")
+    torch.load("trainedModels/default.state", map_location="cpu")
 )
 model_episode = ActionPredictionModel(77, 6, 77, 64)
 model_episode.load_state_dict(deepcopy(model_instance.state_dict()))
@@ -145,6 +145,15 @@ def run():
         )
     )
 
+def predict(molform, spectra):
+    print("Trying out molform : {}\nSpectra :{}".format(molform, spectra))
+    prediction = execute_episode(model_instance, molform, spectra, episode_actor_instance)
+    print(
+        "The molecule predicted by the agent is: {}".format(
+            prediction
+        )
+    )
+    return prediction
 
 if __name__ == "__main__":
     run()

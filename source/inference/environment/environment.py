@@ -1,24 +1,11 @@
-from rdkit import Chem
-from rdkit.Chem import Draw
-from rdkit import RDLogger
-import numpy as np
-import copy
-import random
-from collections import OrderedDict
-from rdkit.Chem import rdMolDescriptors as rdDesc
-from .molecular_graph import *
-from .molecule_state import MolState
-import torch
+from source.inference.environment.molecular_graph import *
+from source.inference.environment.molecule_state import MolState
 import warnings
-from rdkit.Chem.QED import qed
-from rdkit.Chem import AllChem
-from rdkit import DataStructs
-from .RPNMR import predictor_new as P
 from scipy.stats import wasserstein_distance
 import pickle
 from copy import deepcopy
 
-with open("../../data/10kMolSplit.pkl", "rb") as inFile:
+with open("data/10kMolSplit.pkl", "rb") as inFile:
     dat = pickle.load(inFile)
     dat = dat["test_df"]
 

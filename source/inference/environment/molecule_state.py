@@ -1,20 +1,9 @@
 MAX_NODES = 9
 MAX_ACTIONS = MAX_NODES * MAX_NODES * 3
 
-from rdkit import Chem
 from rdkit.Chem import Draw
-from rdkit import RDLogger
-import numpy as np
-import copy
-import random
-from collections import OrderedDict
-from rdkit.Chem import rdMolDescriptors as rdDesc
-from .molecular_graph import *
-import torch
+from source.inference.environment.molecular_graph import *
 import warnings
-from rdkit.Chem.QED import qed
-from rdkit.Chem import AllChem
-from rdkit import DataStructs
 
 lg = RDLogger.logger()
 lg.setLevel(RDLogger.CRITICAL)

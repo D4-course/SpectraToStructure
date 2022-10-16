@@ -12,9 +12,7 @@ from rdkit.Chem.QED import qed
 from tqdm import tqdm
 
 plt.style.use("ggplot")
-from utils.helpers import argmax, stable_normalizer
-from environment.molecule_state import MolState
-from time import time
+from source.inference.utils.helpers import argmax, stable_normalizer
 
 BOND_TYPES = 3
 MAX_NODES = 9

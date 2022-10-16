@@ -2,13 +2,11 @@ MAX_NODES = 9
 MAX_ACTIONS = MAX_NODES * MAX_NODES * 3
 
 
-from gcn import GCN
-import math
+from source.inference.gcn import GCN
 import torch
 import torch.nn as nn
 import numpy as np
 from dgl.nn.pytorch import SumPooling
-from dgl import backend as F
 
 device = torch.device("cuda:0")
 
