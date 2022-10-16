@@ -12,7 +12,10 @@ RUN . /root/.bashrc && \
 RUN apt-get update && apt-get install -y gcc
 
 COPY ./requirements/conda_pip_for_pip.txt pip2.txt
-#pip install -r ./pip2.txt
+
+RUN echo "conda activate main" >> ~/.bashrc
+RUN conda run -n main pip install -r ./pip2.txt
+
 #CMD ["/bin/bash"]
 #RUN conda env update --name main --file ./pip_ones.yml
 #
