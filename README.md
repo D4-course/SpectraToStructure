@@ -1,5 +1,13 @@
 # Spectra To Structure : Deep Reinforcement Learning for Molecular Inverse Problem
 
+```
+Team 22
+
+Sriram Devata
+S Bhuvanesh
+
+Video Demo Link for Project 1: https://youtu.be/Pvag3awDuEc
+```
 
 ## Setting up the environment
 
